@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+langchain
+langchain-openai
+langchain-community
+langchain-text-splitters
+chromadb
+pypdf
+python-dotenv
+tiktoken
+python-multipart
+langchain-chroma
