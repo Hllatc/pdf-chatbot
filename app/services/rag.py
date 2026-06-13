@@ -4,6 +4,9 @@ from app.database import get_embedding
 from langchain_chroma import Chroma
 
 from dotenv import load_dotenv
+from app.services.llm import get_llm
+from app.services.prompt import build_prompt
+
 load_dotenv()
 
 
@@ -29,7 +32,6 @@ CHROMA_PATH = "chroma_db"
 def add_pdf_to_db(file_path):
 
     documents = load_pdf(file_path)
-
     chunks = split_documents(documents)
 
     db = Chroma(
@@ -38,8 +40,6 @@ def add_pdf_to_db(file_path):
     )
 
     db.add_documents(chunks)
-
-    db.persist()
 
     return len(chunks)
 
@@ -56,31 +56,35 @@ def retrieve(question):
 
     return docs
 
-from langchain_openai import ChatOpenAI
 
-def get_llm():
-
-    return ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0
-    )
 
 def ask_pdf(question):
     docs = retrieve(question)
 
-    context = "\n\n".join(
-        [doc.page_content for doc in docs]
-    )
+    context = ""
+
+    sources = []
+
+    for doc in docs:
+
+        page = doc.metadata.get("page", "?")
+
+        sources.append(page)
+
+        context += f"""
+    Page {page}
+
+    {doc.page_content}
+
+    """
+        
+    prompt = build_prompt(context, question)
+    
     llm = get_llm()
     
-    prompt = f"""
-    Context:
-    {context}
-
-    Question:
-    {question}
-    """
-
     response = llm.invoke(prompt)
 
-    return response.content
+    return {
+    "answer": response.content,
+    "sources": list(set(sources))
+}

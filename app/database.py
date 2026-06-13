@@ -1,12 +1,12 @@
-from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
-
+from langchain_chroma import Chroma
 CHROMA_PATH = "chroma_db"
+
+from langchain_huggingface import HuggingFaceEmbeddings
 
 def get_embedding():
 
-    return OpenAIEmbeddings(
-        model="text-embedding-3-small"
+    return HuggingFaceEmbeddings(
+        model_name="intfloat/multilingual-e5-base"
     )
 
 

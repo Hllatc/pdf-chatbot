@@ -1,10 +1,9 @@
-from fastapi import FastAPI
-from fastapi import UploadFile
-from fastapi import File
-
+from fastapi import FastAPI, UploadFile, File
 import shutil
+from pathlib import Path
 
-from app.rag import add_pdf_to_db
+from .services.rag import add_pdf_to_db, ask_pdf
+from .schemas import QuestionRequest
 
 app = FastAPI()
 
@@ -30,7 +29,7 @@ async def upload_pdf(
     }
 
 from app.schemas import QuestionRequest
-from app.rag import ask_pdf
+from app.services.rag import ask_pdf
 
 @app.post("/ask")
 def ask(request: QuestionRequest):
